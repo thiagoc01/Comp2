@@ -1,0 +1,3 @@
+a) O objetivo dele é dividir 1 em 100 partes e imprimir esse resultado em porcentagem.
+
+b) Não, porque a centésima iteração, que corresponde ao 100, não é impressa na tela, pois não está inclusa no ciclo "for".

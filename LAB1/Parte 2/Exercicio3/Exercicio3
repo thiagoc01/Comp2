@@ -1,0 +1,8 @@
+a) 
+
+   I - java.lang.OutOfMemoryError;
+   
+   II - java.lang.ArrayIndexOutOfBoundsException
+   
+ b) 
+    LocalDateTime. Criamos uma instância dessa classe usando o método now.

@@ -2,8 +2,8 @@ public class Pilha<T> { // Vetor generico
 	
 	private T[] vetor;
 	
-	private static int tamanho;
-	private static int topo = -1;
+	private int tamanho;
+	private int topo = -1;
 	
 	/**
 	 * Construtor

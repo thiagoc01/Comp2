@@ -2,8 +2,8 @@ public class Pilha<T> { // Vetor generico
 	
 	private T[] vetor;
 	
-	private static int tamanho;
-	private static int topo = -1;
+	private int tamanho;
+	private int topo = -1;
 	
 	/**
 	 * Construtor
@@ -38,7 +38,7 @@ public class Pilha<T> { // Vetor generico
 	/**
 	 * Adiciona um novo elemento a pilha
 	 * <p>
-	 * Verifica inicialmente se esta cheia. Se sim, lança uma excecao indicando.
+	 * Verifica inicialmente se esta cheia. Se sim, lanÃ§a uma excecao indicando.
 	 * Senao, adiciona o elemento no topo e soma um no indicador de elementos da pilha.
 	 * </p>
 	 * @param item Elemento a ser adicionado
@@ -58,8 +58,9 @@ public class Pilha<T> { // Vetor generico
 	/**
 	 * "Remove" o elemento mais acima na pilha.
 	 * <p>
-	 * Verifica inicialmente se esta vazia. Se sim, lança uma excecao indicando.
-	 * Senao, diminui um espaço da pilha e retorna o elemento mais acima dela.
+	 * Verifica inicialmente se esta vazia. Se sim, lanÃ§a uma excecao indicando.
+	 * Senao, diminui um espaÃ§o da pilha e retorna o elemento mais acima dela.
+	 * </p>
 	 * @throws IllegalThreadStateException Se houver a tentativa de retirar um elemento, caso a pilha esteja vazia.
 	 * @return saida O elemento mais acima
 	 */

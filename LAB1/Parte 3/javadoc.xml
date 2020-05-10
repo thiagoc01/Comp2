@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="true" classpath="." destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="13" sourcefiles="src/Grafico.java" sourcepath="src" splitindex="true" use="true" version="true">
+            <link href="file:/C:/Users/Thiago%20Castro/Desktop/Java/LAB1/Lista%203/Exercicio/doc/"/>
+        </javadoc>
+    </target>
+</project>

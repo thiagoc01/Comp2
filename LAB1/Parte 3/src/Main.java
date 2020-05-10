@@ -11,11 +11,12 @@ import java.text.Normalizer;
 public class Main {	
 		
 	
-	private static String entradaUsuario = null;	
+	private static String entradaUsuario = null;
+	private String localArquivo = "";
 		
 	
 	/**
-	 * Remove sinais gráficos
+	 * Remove sinais graficos
 	 * @param texto String
 	 * @return String sem acentos
 	 */
@@ -24,7 +25,7 @@ public class Main {
 	}
 	
 	/**
-	 * Recebe entrada do usuário para o ínicio da geração do gráfico
+	 * Recebe entrada do usuario para o inicio da geracao do grafico
 	 */
 	
 	public void recebeEntrada()
@@ -36,6 +37,10 @@ public class Main {
 		
 		entradaUsuario = recebe.nextLine().trim().toUpperCase().replace(" ","");
 		entradaUsuario = removerAcentos(entradaUsuario);
+		
+		System.out.println("Digite o local do arquivo: ");
+		
+		localArquivo = recebe.nextLine().intern();
 		
 		recebe.close();
 	}
@@ -49,15 +54,15 @@ public class Main {
 		{
 			if (entradaUsuario.intern() == "TOTAL")
 			{
-				grafico.geraGraficoTotal();
+				grafico.geraGraficoTotal(exe.localArquivo);
 			}
-			else if (grafico.buscaCidade(entradaUsuario) == true)
+			else if (grafico.buscaCidade(entradaUsuario, exe.localArquivo) == true)
 			{
-				grafico.geraGraficoCidade(entradaUsuario);
+				grafico.geraGraficoCidade(entradaUsuario, exe.localArquivo);
 			}
 			else if (Estados.valueOf(entradaUsuario).toString() == entradaUsuario.intern())
 			{
-				grafico.geraGraficoEstado(entradaUsuario);
+				grafico.geraGraficoEstado(entradaUsuario, exe.localArquivo);
 			}
 			
 		}
@@ -65,7 +70,6 @@ public class Main {
 		catch (IllegalArgumentException e)
 		{
 			System.out.println("Digite um estado ou cidade corretos");
-			System.out.println(entradaUsuario);
 		}
 
 

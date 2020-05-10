@@ -58,7 +58,6 @@ public class Grafico {
 			"</body>\r\n" + 
 			"</html>"; // HTML para ser salvo
 	
-	private final String localArquivo = "C:\\Users\\Thiago Castro\\Desktop\\Java\\LAB1\\Parte 3\\Exercicio\\src\\dados-covid19.csv";
 	private FileWriter saida = null;
 	private BufferedReader leitor = null;
 	private String dataAnalisada = "";
@@ -68,16 +67,17 @@ public class Grafico {
 	
 	/**
 	 * Buscar cidade no arquivo CSV
-	 * @param entradaUsuario String com a cidade desejada pelo usuário
+	 * @param entradaUsuario String com a cidade desejada pelo usuario
+	 * @param local Local do arquivo
 	 * @return true caso encontre a cidade no arquivo CSV, false c.c.
 	 */
-	public boolean buscaCidade(String entradaUsuario)
+	public boolean buscaCidade(String entradaUsuario, String local)
 	{
 		String linha = "";
 		
 		try
 		{
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 			while ( (linha = leitor.readLine()) != null)
 			{
 				linha = linha.toUpperCase().trim().replace(" ", "");
@@ -118,24 +118,25 @@ public class Grafico {
 	}
 	
 	/**
-	 * Gera gráfico com total de casos/mortes no país
+	 * Gera gráfico com total de casos/mortes no pais
 	 * <p>
-	 * Le linha por linha do arquivo e captura data e salva, em um arquivo HTML, o modelo da variável resultado com os casos e mortes da respectiva data. Apenas estados.
+	 * Le linha por linha do arquivo e captura data e salva, em um arquivo HTML, o modelo da variavel resultado com os casos e mortes da respectiva data. Apenas estados.
 	 * </p>
+	 * @param local Local do arquivo
 	 */
-	public void geraGraficoTotal()
+	public void geraGraficoTotal(String local)
 	{	
 		
 		String paraAdicionar = "";
 		
 		try
 		{
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 			File arquivo = new File("Grafico.html");
 			saida = new FileWriter(arquivo,true);
 			String dataFim = leitor.readLine().split(",")[0];
 			leitor.close();
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 				
 			while ( leitor.ready()== true)
 			{
@@ -196,28 +197,30 @@ public class Grafico {
 	}
 	
 	/**
-	 * Gera gráfico com total de casos/mortes em um estado
+	 * Gera grafico com total de casos/mortes em um estado
 	 * <p>
-	 * Le linha por linha do arquivo e captura data e salva, em um arquivo HTML, o modelo da variável resultado com casos e mortes da respectiva data. Apenas o estado solicitado pela usuário
+	 * Le linha por linha do arquivo e captura data e salva, em um arquivo HTML, o modelo da variavel resultado com casos e mortes da respectiva data. Apenas o estado solicitado pela usuario
 	 * </p>
-	 * @param entradaUsuario String com o estado desejado pelo usuário.
+	 * @param entradaUsuario String com o estado desejado pelo usuario.
+	 * @param local Local do arquivo
 	 */
-	public void geraGraficoEstado(String entradaUsuario)
+	public void geraGraficoEstado(String entradaUsuario, String local)
 	{
 		
 		Estados d = Estados.valueOf(entradaUsuario);
 		String estadoAnalisado = d.retornaEstado();
+		System.out.println(local);
 		
 		String paraAdicionar = "";
 		
 		try
 		{
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 			File arquivo = new File("Grafico.html");
 			saida = new FileWriter(arquivo, true);
 			String dataFim = leitor.readLine().split(",")[0];
 			leitor.close();
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 			
 			while ( leitor.ready() == true)
 			{
@@ -276,26 +279,28 @@ public class Grafico {
 	}
 	
 	/**
-	 * Gera gráfico com total de casos/mortes no país
+	 * Gera gráfico com total de casos/mortes em uma cidade
 	 * <p>
-	 * Le linha por linha do arquivo e captura data e salva, em um arquivo HTML, o modelo da variável resultado com casos e mortes da respectiva data.
-	 * Apenas a cidade fornecida pelo usuário.
+	 * Le linha por linha do arquivo e captura data e salva, em um arquivo HTML, o modelo da variavel resultado com casos e mortes da respectiva data.
+	 * Apenas a cidade fornecida pelo usuario.
 	 * </p>
-	 * @param entradaUsuario String com a cidade desejada pelo usuário.
+	 * @param entradaUsuario String com a cidade desejada pelo usuario.
+	 * @param local Local do arquivo
 	 */
 		
-	public void geraGraficoCidade(String entradaUsuario)
+	public void geraGraficoCidade(String entradaUsuario, String local)
 	{
         String paraAdicionar = "";
+        
 		
 		try
 		{
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 			File arquivo = new File("Grafico.html");
 			saida = new FileWriter(arquivo,true);
 			String dataFim = leitor.readLine().split(",")[0];
 			leitor.close();
-			leitor = new BufferedReader(new FileReader(localArquivo));
+			leitor = new BufferedReader(new FileReader(local));
 				
 			while ( leitor.ready()== true)
 			{

@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+  <title>Gráfico COVID-19</title>
+
+  <style type="text/css">
+    body, html {
+      font-family: sans-serif;
+    }
+  </style>
+
+<script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Gráfico COVID-19</h2>
+<br />
+<div id="visualization"></div>
+
+<script type="text/javascript">
+
+    var container = document.getElementById('visualization');
+
+    var groups = new vis.DataSet([
+            {id: "Casos", content: "Casos"},
+            {id: "Mortes", content: "Mortes"}
+        ]
+    );
+
+    var items = [
+        	{x:'2020-05-09', y:16929, group: "Casos"},
+	{x:'2020-05-09', y:1653, group: "Mortes"},
+	{x:'2020-05-08', y:15741, group: "Casos"},
+	{x:'2020-05-08', y:1503, group: "Mortes"},
+	{x:'2020-05-07', y:14156, group: "Casos"},
+	{x:'2020-05-07', y:1394, group: "Mortes"},
+	{x:'2020-05-06', y:13295, group: "Casos"},
+	{x:'2020-05-06', y:1205, group: "Mortes"},
+	{x:'2020-05-05', y:12391, group: "Casos"},
+	{x:'2020-05-05', y:1123, group: "Mortes"},
+	{x:'2020-05-04', y:11721, group: "Casos"},
+	{x:'2020-05-04', y:1065, group: "Mortes"},
+	{x:'2020-05-03', y:11139, group: "Casos"},
+	{x:'2020-05-03', y:1019, group: "Mortes"},
+	{x:'2020-05-02', y:10546, group: "Casos"},
+	{x:'2020-05-02', y:971, group: "Mortes"},
+	{x:'2020-05-01', y:10166, group: "Casos"},
+	{x:'2020-05-01', y:921, group: "Mortes"},
+	{x:'2020-04-30', y:9453, group: "Casos"},
+	{x:'2020-04-30', y:854, group: "Mortes"},
+	{x:'2020-04-29', y:8869, group: "Casos"},
+	{x:'2020-04-29', y:794, group: "Mortes"},
+	{x:'2020-04-28', y:8504, group: "Casos"},
+	{x:'2020-04-28', y:738, group: "Mortes"},
+	{x:'2020-04-27', y:7944, group: "Casos"},
+	{x:'2020-04-27', y:677, group: "Mortes"},
+	{x:'2020-04-26', y:7111, group: "Casos"},
+	{x:'2020-04-26', y:645, group: "Mortes"},
+	{x:'2020-04-25', y:6828, group: "Casos"},
+	{x:'2020-04-25', y:615, group: "Mortes"},
+	{x:'2020-04-24', y:6282, group: "Casos"},
+	{x:'2020-04-24', y:570, group: "Mortes"},
+	{x:'2020-04-23', y:6172, group: "Casos"},
+	{x:'2020-04-23', y:530, group: "Mortes"},
+	{x:'2020-04-22', y:5552, group: "Casos"},
+	{x:'2020-04-22', y:490, group: "Mortes"},
+	{x:'2020-04-21', y:5306, group: "Casos"},
+	{x:'2020-04-21', y:461, group: "Mortes"},
+	{x:'2020-04-20', y:4899, group: "Casos"},
+	{x:'2020-04-20', y:422, group: "Mortes"},
+	{x:'2020-04-19', y:4675, group: "Casos"},
+	{x:'2020-04-19', y:402, group: "Mortes"},
+	{x:'2020-04-18', y:4543, group: "Casos"},
+	{x:'2020-04-18', y:387, group: "Mortes"},
+	{x:'2020-04-17', y:4349, group: "Casos"},
+	{x:'2020-04-17', y:341, group: "Mortes"},
+	{x:'2020-04-16', y:3944, group: "Casos"},
+	{x:'2020-04-16', y:301, group: "Mortes"},
+	{x:'2020-04-15', y:3743, group: "Casos"},
+	{x:'2020-04-15', y:265, group: "Mortes"},
+	{x:'2020-04-14', y:3410, group: "Casos"},
+	{x:'2020-04-14', y:224, group: "Mortes"},
+	{x:'2020-04-13', y:3221, group: "Casos"},
+	{x:'2020-04-13', y:182, group: "Mortes"},
+	{x:'2020-04-12', y:2855, group: "Casos"},
+	{x:'2020-04-12', y:170, group: "Mortes"},
+	{x:'2020-04-11', y:2607, group: "Casos"},
+	{x:'2020-04-11', y:155, group: "Mortes"},
+	{x:'2020-04-10', y:2464, group: "Casos"},
+	{x:'2020-04-10', y:147, group: "Mortes"},
+	{x:'2020-04-09', y:2216, group: "Casos"},
+	{x:'2020-04-09', y:122, group: "Mortes"},
+	{x:'2020-04-08', y:1938, group: "Casos"},
+	{x:'2020-04-08', y:106, group: "Mortes"},
+	{x:'2020-04-07', y:1688, group: "Casos"},
+	{x:'2020-04-07', y:89, group: "Mortes"},
+	{x:'2020-04-06', y:1461, group: "Casos"},
+	{x:'2020-04-06', y:71, group: "Mortes"},
+	{x:'2020-04-05', y:1394, group: "Casos"},
+	{x:'2020-04-05', y:64, group: "Mortes"},
+	{x:'2020-04-04', y:1246, group: "Casos"},
+	{x:'2020-04-04', y:58, group: "Mortes"},
+	{x:'2020-04-03', y:1074, group: "Casos"},
+	{x:'2020-04-03', y:47, group: "Mortes"},
+	{x:'2020-04-02', y:992, group: "Casos"},
+	{x:'2020-04-02', y:41, group: "Mortes"},
+	{x:'2020-04-01', y:832, group: "Casos"},
+	{x:'2020-04-01', y:28, group: "Mortes"},
+	{x:'2020-03-31', y:708, group: "Casos"},
+	{x:'2020-03-31', y:23, group: "Mortes"},
+	{x:'2020-03-30', y:657, group: "Casos"},
+	{x:'2020-03-30', y:18, group: "Mortes"},
+	{x:'2020-03-29', y:600, group: "Casos"},
+	{x:'2020-03-29', y:17, group: "Mortes"},
+	{x:'2020-03-28', y:558, group: "Casos"},
+	{x:'2020-03-28', y:13, group: "Mortes"},
+	{x:'2020-03-27', y:493, group: "Casos"},
+	{x:'2020-03-27', y:10, group: "Mortes"},
+	{x:'2020-03-26', y:421, group: "Casos"},
+	{x:'2020-03-26', y:9, group: "Mortes"},
+	{x:'2020-03-25', y:370, group: "Casos"},
+	{x:'2020-03-25', y:8, group: "Mortes"},
+	{x:'2020-03-24', y:305, group: "Casos"},
+	{x:'2020-03-24', y:6, group: "Mortes"},
+	{x:'2020-03-23', y:233, group: "Casos"},
+	{x:'2020-03-23', y:4, group: "Mortes"},
+	{x:'2020-03-22', y:186, group: "Casos"},
+	{x:'2020-03-22', y:3, group: "Mortes"},
+	{x:'2020-03-21', y:119, group: "Casos"},
+	{x:'2020-03-21', y:3, group: "Mortes"},
+	{x:'2020-03-20', y:0, group: "Casos"},
+	{x:'2020-03-20', y:0, group: "Mortes"},
+	{x:'2020-03-19', y:66, group: "Casos"},
+	{x:'2020-03-19', y:2, group: "Mortes"},
+	{x:'2020-03-18', y:63, group: "Casos"},
+	{x:'2020-03-18', y:0, group: "Mortes"},
+	{x:'2020-03-17', y:0, group: "Casos"},
+	{x:'2020-03-17', y:0, group: "Mortes"},
+	{x:'2020-03-16', y:25, group: "Casos"},
+	{x:'2020-03-16', y:0, group: "Mortes"},
+	{x:'2020-03-15', y:24, group: "Casos"},
+	{x:'2020-03-15', y:0, group: "Mortes"},
+	{x:'2020-03-14', y:0, group: "Casos"},
+	{x:'2020-03-14', y:0, group: "Mortes"},
+	{x:'2020-03-13', y:0, group: "Casos"},
+	{x:'2020-03-13', y:0, group: "Mortes"},
+	{x:'2020-03-12', y:15, group: "Casos"},
+	{x:'2020-03-12', y:0, group: "Mortes"},
+	{x:'2020-03-11', y:0, group: "Casos"},
+	{x:'2020-03-11', y:0, group: "Mortes"},
+	{x:'2020-03-10', y:0, group: "Casos"},
+	{x:'2020-03-10', y:0, group: "Mortes"},
+	{x:'2020-03-09', y:0, group: "Casos"},
+	{x:'2020-03-09', y:0, group: "Mortes"},
+	{x:'2020-03-08', y:3, group: "Casos"},
+	{x:'2020-03-08', y:0, group: "Mortes"},
+	{x:'2020-03-07', y:0, group: "Casos"},
+	{x:'2020-03-07', y:0, group: "Mortes"},
+	{x:'2020-03-06', y:2, group: "Casos"},
+	{x:'2020-03-06', y:0, group: "Mortes"},
+	{x:'2020-03-05', y:1, group: "Casos"},
+	{x:'2020-03-05', y:0, group: "Mortes"},
+	{x:'2020-03-04', y:0, group: "Casos"},
+	{x:'2020-03-04', y:0, group: "Mortes"},
+	{x:'2020-03-03', y:0, group: "Casos"},
+	{x:'2020-03-03', y:0, group: "Mortes"},
+	{x:'2020-03-02', y:0, group: "Casos"},
+	{x:'2020-03-02', y:0, group: "Mortes"},
+	{x:'2020-03-01', y:0, group: "Casos"},
+	{x:'2020-03-01', y:0, group: "Mortes"},
+	{x:'2020-02-29', y:0, group: "Casos"},
+	{x:'2020-02-29', y:0, group: "Mortes"},
+	{x:'2020-02-28', y:0, group: "Casos"},
+	{x:'2020-02-28', y:0, group: "Mortes"},
+	{x:'2020-02-27', y:0, group: "Casos"},
+	{x:'2020-02-27', y:0, group: "Mortes"},
+	{x:'2020-02-26', y:0, group: "Casos"},
+	{x:'2020-02-26', y:0, group: "Mortes"},
+	{x:'2020-02-25', y:0, group: "Casos"},
+	{x:'2020-02-25', y:0, group: "Mortes"},
+    ];
+
+    var dataset = new vis.DataSet(items);
+    var options = {
+        start: '2020-02-25',
+        end: '2020-05-09',
+        legend: true,
+        locale: 'pt-br'
+    };
+  var graph2d = new vis.Graph2d(container, dataset, groups, options);
+</script>
+</body>
+</html>

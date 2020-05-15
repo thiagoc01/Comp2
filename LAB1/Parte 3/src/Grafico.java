@@ -78,6 +78,7 @@ public class Grafico {
 		try
 		{
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
 			while ( (linha = leitor.readLine()) != null)
 			{
 				linha = linha.toUpperCase().trim().replace(" ", "");
@@ -132,11 +133,14 @@ public class Grafico {
 		try
 		{
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
 			File arquivo = new File("Grafico.html");
-			saida = new FileWriter(arquivo,true);
+			saida = new FileWriter(arquivo, false);
 			String dataFim = leitor.readLine().split(",")[0];
 			leitor.close();
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
+			
 				
 			while ( leitor.ready()== true)
 			{
@@ -209,18 +213,19 @@ public class Grafico {
 		
 		Estados d = Estados.valueOf(entradaUsuario);
 		String estadoAnalisado = d.retornaEstado();
-		System.out.println(local);
 		
 		String paraAdicionar = "";
 		
 		try
 		{
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
 			File arquivo = new File("Grafico.html");
-			saida = new FileWriter(arquivo, true);
+			saida = new FileWriter(arquivo, false);
 			String dataFim = leitor.readLine().split(",")[0];
 			leitor.close();
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
 			
 			while ( leitor.ready() == true)
 			{
@@ -296,11 +301,13 @@ public class Grafico {
 		try
 		{
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
 			File arquivo = new File("Grafico.html");
-			saida = new FileWriter(arquivo,true);
+			saida = new FileWriter(arquivo, false);
 			String dataFim = leitor.readLine().split(",")[0];
 			leitor.close();
 			leitor = new BufferedReader(new FileReader(local));
+			leitor.readLine();
 				
 			while ( leitor.ready()== true)
 			{

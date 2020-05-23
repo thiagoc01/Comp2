@@ -2,7 +2,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -22,7 +21,7 @@ import java.io.IOException;
  */
 
 
-public final class Arquivo {
+public final class Arquivo extends javax.swing.filechooser.FileFilter {
 	
 	private File arquivo = null;
 	
@@ -142,6 +141,10 @@ public final class Arquivo {
 		if ( confirmar == JFileChooser.APPROVE_OPTION)
 		{
 			arquivo = verArqSistema.getSelectedFile();
+			if (accept(arquivo) == false)
+			{
+				arquivo = new File(arquivo.getAbsoluteFile() + ".txt");
+			}
 			try
 			{
 				FileWriter arq = new FileWriter(arquivo, false);
@@ -157,6 +160,16 @@ public final class Arquivo {
 		}
 		return null;
 		
+	}
+
+	@Override
+	public boolean accept(File f) {
+		 return f.getName().toLowerCase().endsWith(".txt");
+	}
+
+	@Override
+	public String getDescription() {
+		return "*.txt";
 	}
 
 }

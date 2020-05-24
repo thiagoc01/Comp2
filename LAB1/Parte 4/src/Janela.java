@@ -50,17 +50,18 @@ public class Janela{
 		janela.addWindowListener(fechadorSeguro);
 		
 		JMenuBar menuBase = new JMenuBar();
-		JMenu opcao1 = new JMenu("Arquivo");
-		JMenuItem opcao2 = new JMenuItem("Fechar");		
-		menuBase.add(opcao1);
-		menuBase.add(opcao2);
+		JMenu menuArquivo = new JMenu("Arquivo");
+		menuBase.add(menuArquivo);
 		
-		JMenuItem opcao1_1 = new JMenuItem("Abrir");
-		JMenuItem opcao1_2 = new JMenuItem("Salvar");
-		JMenuItem opcao1_3 = new JMenuItem("Salvar como...");
-		opcao1.add(opcao1_1);
-		opcao1.add(opcao1_2);
-		opcao1.add(opcao1_3);		
+		JMenuItem opcaoAbrir = new JMenuItem("Abrir");
+		JMenuItem opcaoSalvar = new JMenuItem("Salvar");
+		JMenuItem opcaoSalvarComo = new JMenuItem("Salvar como...");
+		JMenuItem opcaoFechar = new JMenuItem("Fechar");
+		menuArquivo.add(opcaoAbrir);
+		menuArquivo.add(opcaoSalvar);
+		menuArquivo.add(opcaoSalvarComo);
+		menuArquivo.addSeparator();
+		menuArquivo.add(opcaoFechar);
 		
 		usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
 		usuario.setWrapStyleWord(true);
@@ -74,7 +75,7 @@ public class Janela{
 		
 	
 		
-		opcao1_1.addActionListener(new ActionListener() {
+		opcaoAbrir.addActionListener(new ActionListener() {
 			/**
 			 * Abertura de arquivo
 			 * <p>
@@ -92,6 +93,8 @@ public class Janela{
 				usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
 				aux.setaMudancaAdiciona(usuario.getText());
 				aux.setaMudancaRemove(usuario.getText());
+				usuario.setWrapStyleWord(true);
+				usuario.setLineWrap(true);
 			}
 		});
 		
@@ -104,7 +107,7 @@ public class Janela{
 		 * @param e Deteccao de clique na opcao
 		 */
 		
-		opcao1_2.addActionListener(new ActionListener() {
+		opcaoSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
 				if (controlaNovosArquivos(janela) == false)
@@ -116,7 +119,9 @@ public class Janela{
 					} 
 					usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
 					aux.setaMudancaAdiciona(usuario.getText());
-					aux.setaMudancaRemove(usuario.getText());					
+					aux.setaMudancaRemove(usuario.getText());
+					usuario.setWrapStyleWord(true);
+					usuario.setLineWrap(true);
 				}
 				
 			}
@@ -129,7 +134,7 @@ public class Janela{
 	     * alem de adicionar as mudancas no buffer de referencia de eventos.
 		 */
 		
-		opcao1_3.addActionListener(new ActionListener() {
+		opcaoSalvarComo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
 				String novoNome = opcoesArquivo.opcaoSalvarComoArquivo(usuario);
@@ -139,6 +144,8 @@ public class Janela{
 					usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
 					aux.setaMudancaAdiciona(usuario.getText());
 					aux.setaMudancaRemove(usuario.getText());
+					usuario.setWrapStyleWord(true);
+					usuario.setLineWrap(true);
 				}
 				
 			}
@@ -153,7 +160,7 @@ public class Janela{
 		 * @param e A deteccao do clique no botao fechar
 		 */
 		
-		opcao2.addActionListener(new ActionListener() {
+		opcaoFechar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
 				if ((aux.retornaMudancaAdiciona() != usuario.getText().intern() || aux.retornaMudancaRemove() != usuario.getText().intern()) && opcoesArquivo.verificaArquivo() != null)

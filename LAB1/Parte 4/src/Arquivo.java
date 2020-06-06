@@ -1,5 +1,6 @@
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
@@ -32,6 +33,33 @@ public final class Arquivo extends javax.swing.filechooser.FileFilter {
 	public File verificaArquivo()
 	{
 		return arquivo;
+	}
+	
+	/**
+	 * Metodo de salvamento
+	 * <p>
+	 * Apenas declarada para nao haver duplicata de codigo nos metodos opcaoSalvarComoArquivo e opcaoSalvarArquivo.
+	 * @param entrada Campo texto do editor
+	 * @return Nome do Arquivo para titulo da janela ou null caso nao aconteca mudanca.
+	 */
+	public String salvar(JTextArea entrada)
+	{
+		try
+		{
+			FileWriter arq = new FileWriter(arquivo, false);
+			BufferedWriter buffer = new BufferedWriter(arq);
+			entrada.write(buffer);
+			buffer.close();
+			arq.close();
+			String nomeArquivo = arquivo.getName().replaceAll(".txt", "");
+			return nomeArquivo;
+		}
+		catch (IOException e)
+		{
+			
+		}
+		return null;
+		
 	}
 	
 	/**
@@ -95,36 +123,27 @@ public final class Arquivo extends javax.swing.filechooser.FileFilter {
 	
 	public String opcaoSalvarArquivo(JTextArea entrada)
 	{
-		String nomeArquivo = "";
+		String nomeArquivo;
 		
 		try
 		{
-			FileWriter arq = new FileWriter(arquivo, false);
-			BufferedWriter buffer = new BufferedWriter(arq);
-			entrada.write(buffer);
-			buffer.close();
-			arq.close();
-			nomeArquivo = arquivo.getName().replaceAll(".txt", "");
+			nomeArquivo = salvar(entrada);
 			return nomeArquivo;
 		}
 		catch (Exception e)
 		{
 			
 		}
-		return null;
-		
-		
-		
-		
+		return null;	
 	}
 	
 	/**
 	 * Salva arquivo pelo dialogo do sistema.
 	 * <p>
-	 * Utiliza a classe JFileChooser para gerar um GUI que interaja com o usuario.
-	 * Caso o usuario selecione um arquivo, e aberto um descritor com o local indicado e esse arquivo e sobrescrito.
+	 * Utiliza a classe JFileChooser para gerar uma GUI que interaja com o usuario.
+	 * Caso o usuario selecione um arquivo ja existente ou digite um nome de arquivo ja existente, o metodo pergunta se ele deseja sobrescrever o arquivo. Se sim, prossegue. Se não, encerra o metodo.
 	 * Caso o usuario digite um nome novo, um novo arquivo e gerado no diretorio desejado, com o nome desejado.
-	 * Caso nao, o metodo e encerrado.
+	 * Caso nao deseje prosseguir, o metodo e encerrado.
 	 * </p>
 	 * @param entrada O campo de texto do editor de texto
 	 * @return nome do arquivo ou null caso o metodo seja encerrado
@@ -134,9 +153,10 @@ public final class Arquivo extends javax.swing.filechooser.FileFilter {
 	{
 		JFileChooser verArqSistema = new JFileChooser();
 		FileNameExtensionFilter filtroTxt = new FileNameExtensionFilter("Documentos de Texto (*.txt)", "txt");
+		JDialog salvarArquivo = new JDialog();
 		verArqSistema.setFileFilter(filtroTxt);
-		int confirmar = verArqSistema.showSaveDialog(new JFrame());
-		String nomeArquivo = "";
+		int confirmar = verArqSistema.showSaveDialog(salvarArquivo);
+		String nomeArquivo;
 		
 		if ( confirmar == JFileChooser.APPROVE_OPTION)
 		{
@@ -145,14 +165,22 @@ public final class Arquivo extends javax.swing.filechooser.FileFilter {
 			{
 				arquivo = new File(arquivo.getAbsoluteFile() + ".txt");
 			}
+			if (arquivo.exists()) // Verifica a existencia do arquivo
+			{
+				JLabel mensagem = new JLabel("Deseja sobrescrever o arquivo já existente?");
+				int confirmacao = JOptionPane.showConfirmDialog(salvarArquivo , mensagem, "Arquivo já existente", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				
+				if (confirmacao == JOptionPane.YES_OPTION)
+				{
+					nomeArquivo = salvar(entrada); // Chama o metodo de salvar.
+					return nomeArquivo;					
+				}
+				else
+					return null;
+			}
 			try
 			{
-				FileWriter arq = new FileWriter(arquivo, false);
-				BufferedWriter buffer = new BufferedWriter(arq);
-				entrada.write(buffer);
-				buffer.close();
-				arq.close();
-				nomeArquivo = arquivo.getName().replaceAll(".txt","");
+				nomeArquivo = salvar(entrada);
 				return nomeArquivo;
 			}
 			catch(Exception e){}

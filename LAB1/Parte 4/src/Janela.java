@@ -3,17 +3,24 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.KeyStroke;
+import javax.swing.undo.UndoManager;
+
+
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 
+import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -24,22 +31,44 @@ import java.awt.event.WindowListener;
  *
  */
 
+/**
+ * Essa classe controla a criacao da janela principal, de suas ramificacoes e de
+ * qualquer acao realizada nela.
+ */
 
 
 public class Janela{
 	
-	private Arquivo opcoesArquivo = new Arquivo(); 
-	JTextArea usuario = new JTextArea(); // Campo principal de texto
+	private Arquivo opcoesArquivo = new Arquivo(); // Usado para chamada de funções de arquivo
+	private JTextArea usuario = new JTextArea(); // Campo principal de texto
 	
-	ControleFechamentoJanela fechadorSeguro = new ControleFechamentoJanela(); // Classe com metodo windowClosing() para aplicar o botao fechar ao X da janela
-	VerificadorMudancasTexto aux = new VerificadorMudancasTexto(); // Instância para verificar mudanças de texto no documento
+	private ControleFechamentoJanela fechadorSeguro = new ControleFechamentoJanela(); // Classe com metodo windowClosing() para aplicar o botao fechar ao X da janela
+	private VerificadorMudancasTexto aux = new VerificadorMudancasTexto(); // Instância para verificar mudanças de texto no documento
+	protected UndoManager refazDesfaz = new UndoManager(); // Armazena qualquer mudança nos textos
+	private ControleDesfaz desfaz = new ControleDesfaz();
+	private ControleRefaz refaz = new ControleRefaz();
+	
+	
 	static JFrame janela;
+	
+	
+	JMenuBar menuBase = new JMenuBar();
+	
+	JMenu menuArquivo = new JMenu("Arquivo");
+	JMenuItem opcaoAbrir = new JMenuItem("Abrir");
+	JMenuItem opcaoSalvar = new JMenuItem("Salvar");
+	JMenuItem opcaoSalvarComo = new JMenuItem("Salvar como...");
+	JMenuItem opcaoFechar = new JMenuItem("Fechar");
+	
+	JMenu menuEditar = new JMenu("Editar");
+	JMenuItem opcaoRefazer = new JMenuItem("Refazer");		
+	JMenuItem opcaoDesfazer = new JMenuItem("Desfazer");
 	
 	/**
 	 * Cria a janela do editor de texto
 	 * <p>
 	 * Cria a janela principal com a scrollbar e a barra de menu, utilizando as classes do pacote Swing.
-	 * Nesse metodo, tambem e realizado a chamada de funcoes para os botoes.	 * 
+	 * Nesse metodo, tambem e realizada a chamada de funcoes para os botoes.
 	 * </p>
 	 */
 	
@@ -49,40 +78,49 @@ public class Janela{
 		janela.setSize(800,800);
 		janela.addWindowListener(fechadorSeguro);
 		
-		JMenuBar menuBase = new JMenuBar();
-		JMenu menuArquivo = new JMenu("Arquivo");
-		menuBase.add(menuArquivo);
 		
-		JMenuItem opcaoAbrir = new JMenuItem("Abrir");
-		JMenuItem opcaoSalvar = new JMenuItem("Salvar");
-		JMenuItem opcaoSalvarComo = new JMenuItem("Salvar como...");
-		JMenuItem opcaoFechar = new JMenuItem("Fechar");
+		menuBase.add(menuArquivo);
+		menuBase.add(menuEditar);
+		
+		
+	
 		menuArquivo.add(opcaoAbrir);
 		menuArquivo.add(opcaoSalvar);
 		menuArquivo.add(opcaoSalvarComo);
 		menuArquivo.addSeparator();
 		menuArquivo.add(opcaoFechar);
 		
-		usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
+		
+		menuEditar.add(opcaoRefazer);
+		menuEditar.add(opcaoDesfazer);
+		opcaoRefazer.setEnabled(false);
+		opcaoDesfazer.setEnabled(false);
+		@SuppressWarnings("deprecation")
+		KeyStroke ctrlY = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask());
+		@SuppressWarnings("deprecation")
+		KeyStroke ctrlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask());
+		opcaoRefazer.setAccelerator(ctrlY);
+		opcaoDesfazer.setAccelerator(ctrlZ);
+		
+		
 		usuario.setWrapStyleWord(true);
 		usuario.setLineWrap(true);
-        
+		usuario.getDocument().addUndoableEditListener(aux);
     
 		janela.getContentPane().add(BorderLayout.NORTH, menuBase);
 		janela.getContentPane().add(BorderLayout.CENTER, new JScrollPane(usuario));
 		janela.setVisible(true);
 		
-		
-	
+		/**
+		 * Abertura de arquivo
+		 * <p>
+		 * Chama o metodo abrir arquivo da classe Arquivo. Apos o processo ser realizado, retorna uma string com o nome do arquivo para renomear a janela principal,
+		 * alem de zerar o buffer de edicoes.
+		 * @param e Deteccao de clique na opcao
+		 */
 		
 		opcaoAbrir.addActionListener(new ActionListener() {
-			/**
-			 * Abertura de arquivo
-			 * <p>
-			 * Chama o metodo abrir arquivo da classe Arquivo. Apos o processo ser realizado, retorna uma string com o nome do arquivo para renomear a janela principal,
-			 * alem de adicionar as mudancas no buffer de referencia de eventos.
-			 * @param e Deteccao de clique na opcao
-			 */
+			
 			public void actionPerformed(ActionEvent e)
 			{
 				String novoNome = opcoesArquivo.opcaoAbrirArquivo(usuario);
@@ -90,9 +128,8 @@ public class Janela{
 				{
 					janela.setTitle(novoNome + " - TEdit");
 				} 
-				usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
-				aux.setaMudancaAdiciona(usuario.getText());
-				aux.setaMudancaRemove(usuario.getText());
+				usuario.getDocument().addUndoableEditListener(aux);
+				aux.zeraEditor();
 				usuario.setWrapStyleWord(true);
 				usuario.setLineWrap(true);
 			}
@@ -103,7 +140,7 @@ public class Janela{
 		 * <p>
 		 * Se e um novo arquivo, e perguntado se o usuario deseja criar um novo arquivo. O metodo que controla isso e o controlaNovosArquivos().
 		 * Se nao, apenas salva as mudancas no arquivo ja existente. Apos o processo ser realizado, retorna uma string com o nome do arquivo para renomear a janela principal,
-	     * alem de adicionar as mudancas no buffer de referencia de eventos.
+	     * alem de zerar o buffer de edicoes.
 		 * @param e Deteccao de clique na opcao
 		 */
 		
@@ -117,9 +154,8 @@ public class Janela{
 					{
 						janela.setTitle(novoNome + " - TEdit");
 					} 
-					usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
-					aux.setaMudancaAdiciona(usuario.getText());
-					aux.setaMudancaRemove(usuario.getText());
+					usuario.getDocument().addUndoableEditListener(aux);
+					aux.zeraEditor();
 					usuario.setWrapStyleWord(true);
 					usuario.setLineWrap(true);
 				}
@@ -131,7 +167,7 @@ public class Janela{
 		 * Salvar como novo arquivo ou ja existente
 		 * <p>
 		 * E chamado o metodo salvarComoArquivo() da classe Arquivo. Apos o processo ser realizado, retorna uma string com o nome do arquivo para renomear a janela principal,
-	     * alem de adicionar as mudancas no buffer de referencia de eventos.
+	     * alem de zerar o buffer de edicoes.
 		 */
 		
 		opcaoSalvarComo.addActionListener(new ActionListener() {
@@ -141,9 +177,8 @@ public class Janela{
 				if (novoNome != null)
 				{
 					janela.setTitle(novoNome + " - TEdit");
-					usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
-					aux.setaMudancaAdiciona(usuario.getText());
-					aux.setaMudancaRemove(usuario.getText());
+					usuario.getDocument().addUndoableEditListener(aux);
+					aux.zeraEditor();
 					usuario.setWrapStyleWord(true);
 					usuario.setLineWrap(true);
 				}
@@ -163,7 +198,7 @@ public class Janela{
 		opcaoFechar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((aux.retornaMudancaAdiciona() != usuario.getText().intern() || aux.retornaMudancaRemove() != usuario.getText().intern()) && opcoesArquivo.verificaArquivo() != null)
+				if (opcaoDesfazer.isEnabled() == true  && opcoesArquivo.verificaArquivo() != null)
 				{
 					JLabel mensagem = new JLabel("Deseja salvar as alterações em " + opcoesArquivo.verificaArquivo().toString() + "?");				
 					int confirmacao = JOptionPane.showConfirmDialog(janela, mensagem, "TEdit", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane. WARNING_MESSAGE);
@@ -181,7 +216,7 @@ public class Janela{
 					}
 					
 				}
-				else if ((aux.retornaMudancaAdiciona() != usuario.getText().intern() || aux.retornaMudancaRemove() != usuario.getText().intern()) && opcoesArquivo.verificaArquivo() == null)
+				else if (opcaoDesfazer.isEnabled() == true && opcoesArquivo.verificaArquivo() == null)
 				{
 					JLabel mensagem = new JLabel("Deseja salvar as alterações?" );				
 					int confirmacao = JOptionPane.showConfirmDialog(janela, mensagem, "TEdit", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane. WARNING_MESSAGE);
@@ -206,128 +241,44 @@ public class Janela{
 				
 			}
 		});
-	}
-	
-	private class VerificadorMudancasTexto implements DocumentListener
-	{
-		
-		private String mudancaAdiciona = ""; // String para o metodo insertUpdate()
-		private String mudancaRemove = ""; // String para o metodo removeUpdate()
 		
 		/**
-		 * Altera o histórico de mudancas na string mudancaAdiciona no arquivo.
+		 * Botao refazer
 		 * <p>
-		 * Apos a chamada de funcoes de abrir e salvar arquivos, e necessario a criacao de pontos de partida para a chamada de novas.
-		 * Exemplo: Ao abrir o editor, o padrao, obviamente, e um historico vazio. Ao abrir um arquivo, o novo padrao sera esse arquivo. Qualquer mudanca e relativa a essa abertura.
+		 * Apenas chama a funcao refazer da classe ControleRefazer
 		 * </p>
-		 * @param texto O texto atual no editor
 		 */
 		
-		public void setaMudancaAdiciona(String texto)
-		{
-			mudancaAdiciona = texto;
-
-		}
-		
-		/**
-		 * Altera o histórico de mudancas na string mudancaAdiciona no arquivo.
-		 * <p>
-		 * Apos a chamada de funcoes de abrir e salvar arquivos, e necessario a criacao de pontos de partida para a chamada de novas.
-		 * Exemplo: Ao abrir o editor, o padrao, obviamente, e um historico vazio. Ao abrir um arquivo, o novo padrao sera esse arquivo. Qualquer mudanca e relativa a essa abertura.
-		 * </p>
-		 * @param texto O texto atual no editor
-		 */
-		
-		public void setaMudancaRemove(String texto)
-		{
-			mudancaRemove = texto;
-		
-		}
-		
-		/**
-		 * Retorna o historico atual de mudancas da string mudancaAdiciona no arquivo.
-		 * <p>
-		 * Apos a chamada de funcoes de abrir e salvar arquivos, e necessario a criacao de pontos de partida para a chamada de novas.
-		 * Exemplo: Ao abrir o editor, o padrao, obviamente, e um historico vazio. Ao abrir um arquivo, o novo padrao sera esse arquivo. Qualquer mudanca e relativa a essa abertura.
-		 * </p>
-		 * @return String O texto armazenado no editor antes de abrir/salvar um arquivo.
-		 */
-		
-		public String retornaMudancaAdiciona()
-		{
-			return mudancaAdiciona.intern();
-		}
-		
-		/**
-		 * Retorna o historico atual de mudancas da string mudancaAdiciona no arquivo.
-		 * <p>
-		 * Apos a chamada de funcoes de abrir e salvar arquivos, e necessario a criacao de pontos de partida para a chamada de novas.
-		 * Exemplo: Ao abrir o editor, o padrao, obviamente, e um historico vazio. Ao abrir um arquivo, o novo padrao sera esse arquivo. Qualquer mudanca e relativa a essa abertura.
-		 * </p>
-		 * @return String O texto armazenado no editor antes de abrir/salvar um arquivo.
-		 */
-		
-		public String retornaMudancaRemove()
-		{
-			return mudancaRemove.intern();
-		}
-
-
-		/**
-		 * Insere uma mudanca no historico
-		 * <p>
-		 * Transforma para string uma mudanca adicionada, utilizando a classe Document.
-		 * </p>
-		 * @param e A mudanca detectada no arquivo 
-		 */
-		
-		public void insertUpdate(DocumentEvent e) {
+		opcaoRefazer.addActionListener(new ActionListener() {
 			
-			try
+			public void actionPerformed(ActionEvent e)
 			{
-				mudancaAdiciona = e.getDocument().getText(0, usuario.getText().length());
+				refaz.refazer();
+				
 			}
-			catch (BadLocationException d)
-			{
-				d.printStackTrace();
-			}
-			
-			
-		}
-
-		/**
-		 * Remove uma mudanca no historico
-		 * <p>
-		 * Transforma para string uma mudanca removida, utilizando a classe Document.
-		 * </p>
-		 * @param e A mudanca detectada no arquivo 
-		 */
-		public void removeUpdate(DocumentEvent e) {
-			try
-			{
-				mudancaRemove = e.getDocument().getText(0, usuario.getText().length());
-			}
-			catch (BadLocationException d)
-			{
-				JLabel mensagem = new JLabel("Erro na leitura.");
-				JOptionPane.showMessageDialog(janela , mensagem, "Erro", JOptionPane.ERROR_MESSAGE, null);
-			}
-			
-			
-		}
-
-		/**
-		 * Metodo nao implementado
-		 */
-		public void changedUpdate(DocumentEvent e) {}
+		});
 		
+		/**
+		 * Botao desfazer
+		 * <p>
+		 * Apenas chama a funcao desfazer da classe ControleDesfazer
+		 * </p>
+		 */
+		
+		opcaoDesfazer.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e)
+			{
+				desfaz.desfazer();				
+			}
+		});		
 		
 	}
 	
 	/**
 	 * Verifica se algum arquivo e novo
 	 * <p>
-	 * Caso o arquivo seja novo, a salvar no menu arquivo ira mostrar um dialogo perguntando o desejo do usuario entre salvar ou continuar editando.
+	 * Caso o arquivo seja novo, a opcao salvar do menu arquivo ira mostrar um dialogo perguntando o desejo do usuario entre salvar ou continuar editando.
 	 * Caso contrario, o metodo encerra.
 	 * </p>
 	 * @param programa Janela principal para modificacoes
@@ -348,9 +299,8 @@ public class Janela{
 				{
 					programa.setTitle(novoNome + " - TEdit");
 				}
-				usuario.getDocument().addDocumentListener(new VerificadorMudancasTexto());
-				aux.setaMudancaAdiciona(usuario.getText());
-				aux.setaMudancaRemove(usuario.getText());
+				usuario.getDocument().addUndoableEditListener(aux);
+				aux.zeraEditor();
 			}
 			return true;
 		}
@@ -358,7 +308,125 @@ public class Janela{
 		
 	}
 	
-	private class ControleFechamentoJanela implements WindowListener // Essa classe implementa a interface WindowListener, que controla mudancas na janela. E usada no programa caso o usuario aperte o X.
+	/**
+	 * Essa classe verifica qualquer edicao realizada no campo texto para utilizar na chamada dos
+	 * metodos relacionados ao salvamento e para controle dos botoes refazer e desfazer.
+	 */
+	
+	private class VerificadorMudancasTexto implements UndoableEditListener
+	{
+		
+		/**
+		 * Controle de edicoes
+		 * <p>
+		 * Buffer de edicoes realizada no editor. Qualquer mudanca e relatada para a variavel refazDesfaz da classe UndoManager.
+		 * Com isso, o estado dos botoes desfazer e refazer e atualizado.
+		 * </p>
+		 */
+		public void undoableEditHappened(UndoableEditEvent e)
+		{
+			 
+			refazDesfaz.addEdit(e.getEdit());
+			refaz.atualizaBotao();
+			desfaz.atualizaBotao();
+		}
+		
+		/**
+		 * Zera editor e os botoes caso haja a abertura de um arquivo ou salvamento de um novo. Ou seja, esse e o novo ponto de partida.
+		 */
+		 
+		 public void zeraEditor()
+		 {
+			 refazDesfaz.discardAllEdits();
+			 opcaoDesfazer.setEnabled(false);
+			 opcaoRefazer.setEnabled(false);
+		 }	
+	}
+	
+	/**
+	 * Essa classe implementa a acao do botao desfazer e atualiza seu estado. 
+	 */
+	
+	private class ControleDesfaz
+	{
+		/**
+		 * Desfaz mudancas se possivel. Apos isso, atualiza o estado dos botoes desfazer e refazer.
+		 */
+		
+		public void desfazer() 
+		{
+			try
+			{
+				refazDesfaz.undo();				
+			}
+			catch (CannotUndoException c)
+			{
+				
+			}
+			atualizaBotao();
+			refaz.atualizaBotao();									 
+		}
+		
+		/**
+		 * Atualiza botao desfazer
+		 */
+		
+		protected void atualizaBotao()
+		{
+			if (refazDesfaz.canUndo())
+			{
+				opcaoDesfazer.setEnabled(true);				
+			}
+			else
+				opcaoDesfazer.setEnabled(false);
+			
+		}
+	}
+	
+	/**
+	 * Essa classe implementa a acao do botao refazer e atualiza seu estado. 
+	 */
+	
+	private class ControleRefaz
+	{
+		/**
+		 * Refaz mudancas se possivel. Apos isso, atualiza o estado dos botoes desfazer e refazer.
+		 */
+		
+		public void refazer() 
+		{			
+			try
+			{
+				refazDesfaz.redo();
+			}
+			catch (CannotRedoException c)
+			{					 
+			}
+			atualizaBotao();
+			desfaz.atualizaBotao();					 
+		}
+		
+		/**
+		 * Atualiza botao refazer
+		 */
+		protected void atualizaBotao()
+		{
+			if (refazDesfaz.canRedo())
+			{
+				opcaoRefazer.setEnabled(true);				
+			}
+			else
+				opcaoRefazer.setEnabled(false);			
+		}		
+	}
+	
+	/**
+	 * Essa classe implementa a interface WindowListener, que controla mudancas na janela. 
+	 * E usada no programa caso o usuario aperte o X.
+	 */
+	
+	
+	private class ControleFechamentoJanela implements WindowListener
 	{
 		/**
 		 * Metodo nao implementado
@@ -370,7 +438,7 @@ public class Janela{
 		/**
 		 * Fechar janela pelo X
 		 * <p>
-		 * Utiliza a mesma logica do botao fechar(opcao2 do metodo setaJanelaPrincipal()).
+		 * Utiliza a mesma logica do botao fechar do menu arquivo.
 		 * </p>
 		 * @param e A mudanca na janela detectada pela classe.
 		 */
@@ -378,7 +446,7 @@ public class Janela{
 		@Override
 		public void windowClosing(WindowEvent e) 
 		{
-			if ((aux.retornaMudancaAdiciona() != usuario.getText().intern() || aux.retornaMudancaRemove() != usuario.getText().intern()) && opcoesArquivo.verificaArquivo() != null)
+			if (opcaoDesfazer.isEnabled() == true && opcoesArquivo.verificaArquivo() != null)
 			{
 				JLabel mensagem = new JLabel("Deseja salvar as alterações em " + opcoesArquivo.verificaArquivo().toString() + "?");				
 				int confirmacao = JOptionPane.showConfirmDialog(janela, mensagem, "TEdit", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane. WARNING_MESSAGE);
@@ -400,7 +468,7 @@ public class Janela{
 				}
 				
 			}
-			else if ((aux.retornaMudancaAdiciona() != usuario.getText().intern() || aux.retornaMudancaRemove() != usuario.getText().intern()) && opcoesArquivo.verificaArquivo() == null)
+			else if (opcaoDesfazer.isEnabled() == true && opcoesArquivo.verificaArquivo() == null)
 			{
 				JLabel mensagem = new JLabel("Deseja salvar as alterações?" );				
 				int confirmacao = JOptionPane.showConfirmDialog(janela, mensagem, "TEdit", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane. WARNING_MESSAGE);

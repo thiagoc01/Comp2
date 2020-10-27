@@ -125,7 +125,6 @@ public class Biblioteca
 	 * Verifica se um estudante pode pegar um livro emprestado e também se esse livro está disponível.
 	 * <p>
 	 * 		Se um estudante possui pontos entre 0 e 500, ele recebe 30 pontos se pegar um livro emprestado.
-	 * 		Se um livro possui pontos maiores que 80, a fila é limitada à 3 pessoas para evitar congestionamento.
 	 * 		É impresso na tela qualquer problema na verificação de empréstimo.
 	 * </p>
 	 * @param idAluno o id do aluno a ser verificado
@@ -171,9 +170,9 @@ public class Biblioteca
 			
 			if (livro.getNumExemplares() == 2 || livro.getNumExemplares() == 1)
 			{
-				if (estudante.getPontos() >= 0 || estudante.getPontos() <= 500)
+				if (estudante.getPontos() >= 0 && estudante.getPontos() <= 500)
 				{
-					System.out.println("A nota desse estudante foi aumentada com mais 30 pontos.");
+					System.out.printf("A nota do estudante %d foi aumentada com mais 30 pontos.\n", estudante.getID());
 					estudante.setPontos(estudante.getPontos() + 30);
 				}
 				
@@ -223,7 +222,7 @@ public class Biblioteca
 	}
 	
 	/**
-	 * Reduz a fila se existirem pessoas na espera do livro em que o empréstimo foi encerrado.
+	 * Reduz a fila se existirem pessoas na espera do livro do qual o empréstimo foi encerrado.
 	 * <p>
 	 * 		Nesse método, é procurado o primeiro candidato apto e mais a frente na fila através do método verificaCandidatoFila.
 	 * 		Se ele está apto, é realizado um deslocamento da fila para frente e aquele estudante é removido da fila.
@@ -247,7 +246,7 @@ public class Biblioteca
 				
 				if (verificaCandidatoFila(candidato, posicaoNaLista))
 				{
-					realizaShiftFila(candidato, posicao);
+					realizaShiftFila(candidato, posicao, idLivro);
 					System.out.printf("O estudante com ID %d pegou o livro com ID %d.\n", candidato.getIdEstudante(), candidato.getIdLivro());
 					return;
 				}
@@ -285,15 +284,16 @@ public class Biblioteca
 	 * Realiza o deslocamento da fila após a remoção do estudante que pegou o livro.
 	 * @param candidato o candidato que pegou o livro
 	 * @param posicao a posição na fila para referência de deslocamento
+	 * @param idLivro o ID do livro que foi liberado
 	 */
 	
-	public void realizaShiftFila(Fila candidato, int posicao)
+	public void realizaShiftFila(Fila candidato, int posicao, int idLivro)
 	{
 		for (Fila i : dados.getFila())
 		{
 			if (i.equals(candidato))
 			{
-				if (i.getPosicao() > posicao)
+				if (i.getPosicao() > posicao && i.getIdLivro() == idLivro)
 					i.reduzPosicao();
 			}
 			
@@ -554,11 +554,15 @@ public class Biblioteca
 		Fila testeFila = new Fila(idLivro);
 		Fila testeEstudante = new Fila(idEstudante);
 		int ocorrencias;
+		int ocorrenciaEstudante = dados.getFila().indexOf(testeEstudante);
 		
-		if ( (ocorrencias = Collections.frequency(dados.getFila(), testeEstudante)) == 1)
+		if (Collections.frequency(dados.getFila(), testeEstudante) >= 1)
 		{
-			System.out.println("O estudante já está na fila.");
-			return;	
+			if (dados.getFila().get(ocorrenciaEstudante).getIdLivro() == idLivro)
+			{
+				System.out.println("O estudante já está na fila para esse livro.");
+				return;
+			}
 		}
 		
 		if (Collections.frequency(dados.getFila(), testeFila) >= 3 && dados.getLivros().get(idLivro).getPontos() > 80)
